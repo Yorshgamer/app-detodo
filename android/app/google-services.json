@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "225070298552",
+    "project_id": "detodo-40bb0",
+    "storage_bucket": "detodo-40bb0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225070298552:android:37b8c9c53508a546280b4d",
+        "android_client_info": {
+          "package_name": "com.example.detodo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKoNTIG1QKkpUBLO9qrS8_CmIhrMzoCao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
