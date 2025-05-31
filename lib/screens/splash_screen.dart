@@ -16,66 +16,112 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
-    _verificarEstado();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+
+    _controller.forward();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      _verificarEstado();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _verificarEstado() async {
-    await Future.delayed(const Duration(seconds: 2)); // un splash chill
-
-    final prefs = await SharedPreferences.getInstance();
-    final primeraVez = prefs.getBool('primera_vez') ?? true;
-
-    if (primeraVez) {
-      await prefs.setBool('primera_vez', false);
-      Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (_) => const CatalogoScreen(modoInvitado: true)),
-      );
-      return;
-    }
+    await Future.delayed(const Duration(seconds: 3)); // Splash chill
 
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
-      Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+    if (user != null) {
+      try {
+        final snap = await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(user.uid)
+            .get();
+
+        final data = snap.data();
+
+        if (data != null) {
+          final userModel = UserModel.fromMap(user.uid, data);
+
+          if (userModel.esAdmin) {
+            // Admin detectado
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+            );
+            return;
+          }
+        }
+
+        // Usuario logueado normal
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CatalogoScreen(modoInvitado: false),
+          ),
+        );
+      } catch (e) {
+        // Si falla algo, lo manda como invitado al catálogo
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CatalogoScreen(modoInvitado: true),
+          ),
+        );
+      }
     } else {
-      final snap = await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(user.uid)
-          .get();
-
-      final data = snap.data();
-      if (data == null) {
-        Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
-        return;
-      }
-
-      final userModel = UserModel.fromMap(user.uid, data);
-
-      if (userModel.esAdmin) {
-        Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
-        );
-      } else {
-        Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (_) => const UserHomeScreen()),
-        );
-      }
+      // No logueado => catálogo como invitado
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const CatalogoScreen(modoInvitado: true),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Color(0xFFFBC02D),
       body: Center(
-        child: CircularProgressIndicator(),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/logo.png', width: 150, height: 150),
+              const SizedBox(height: 20),
+              const CircularProgressIndicator(
+                color: Colors.deepPurple, // o tu color principal
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Cargando DeTodo...",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
