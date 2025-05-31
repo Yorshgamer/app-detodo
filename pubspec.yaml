@@ -13,11 +13,18 @@ dependencies:
   cloud_firestore: ^5.6.8
   firebase_auth: ^5.5.4
   shared_preferences: ^2.5.3
+  simple_animations: ^5.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png" # <-- Ruta de tu nuevo logo
 
 flutter:
   uses-material-design: true

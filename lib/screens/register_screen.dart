@@ -26,23 +26,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // Crear usuario en Firebase Auth
       final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Guardar datos extra en Firestore
-      final userDoc = FirebaseFirestore.instance.collection('usuarios').doc(cred.user!.uid);
+      final userDoc = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(cred.user!.uid);
 
       await userDoc.set({
         'nombre': nombreController.text.trim(),
         'email': emailController.text.trim(),
-        'esAdmin': false, // Siempre falso en registro normal
+        'esAdmin': false,
       });
 
-      // Redirigir a home usuario
-      Navigator.pushReplacement(context,
+      Navigator.pushReplacement(
+        context,
         MaterialPageRoute(builder: (_) => const UserHomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
@@ -55,23 +55,93 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registro')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Column(
           children: [
-            TextField(controller: nombreController, decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Correo')),
-            TextField(controller: passwordController, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
-            const SizedBox(height: 16),
-            if (error.isNotEmpty) Text(error, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 16),
-            cargando
-              ? const CircularProgressIndicator()
-              : ElevatedButton(
-                  onPressed: registrar,
-                  child: const Text('Registrarse'),
+            const SizedBox(height: 30),
+            Center(
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 130,
+                height: 130,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Registro',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 32),
+            TextField(
+              controller: nombreController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white38),
                 ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.cyanAccent),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: emailController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Correo',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white38),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.cyanAccent),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Contraseña',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white38),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.cyanAccent),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            if (error.isNotEmpty)
+              Text(error, style: const TextStyle(color: Colors.redAccent)),
+            const SizedBox(height: 20),
+            cargando
+                ? const CircularProgressIndicator(color: Colors.cyanAccent)
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: registrar,
+                      child: const Text('Registrarse'),
+                    ),
+                  ),
           ],
         ),
       ),
