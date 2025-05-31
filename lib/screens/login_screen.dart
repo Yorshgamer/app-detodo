@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       final data = userDoc.data()!;
-      final esAdmin = data['esAdmin '] ?? false;
+      final esAdmin = data['esAdmin'] ?? false;
 
       if (esAdmin) {
         Navigator.pushReplacement(
