@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
 import '../screens/user_home_screen.dart';
 import '../screens/admin_home_screen.dart';
 import '../screens/login_screen.dart';
-import '../screens/catalogo_screen.dart'; // La crearás después
+import '../screens/catalogo_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -30,7 +29,10 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 1),
     );
 
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
 
     _controller.forward();
 
@@ -46,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _verificarEstado() async {
-    await Future.delayed(const Duration(seconds: 3)); // Splash chill
+    await Future.delayed(const Duration(seconds: 3));
 
     final user = FirebaseAuth.instance.currentUser;
 
@@ -63,7 +65,6 @@ class _SplashScreenState extends State<SplashScreen>
           final userModel = UserModel.fromMap(user.uid, data);
 
           if (userModel.esAdmin) {
-            // Admin detectado
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
@@ -72,7 +73,6 @@ class _SplashScreenState extends State<SplashScreen>
           }
         }
 
-        // Usuario logueado normal
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -80,7 +80,6 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } catch (e) {
-        // Si falla algo, lo manda como invitado al catálogo
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -89,7 +88,6 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
     } else {
-      // No logueado => catálogo como invitado
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -102,22 +100,60 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFBC02D),
+      backgroundColor: Colors.black,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/logo.png', width: 150, height: 150),
+              Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.yellowAccent.withOpacity(0.4),
+                      blurRadius: 25,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 30),
+              const SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Colors.cyanAccent,
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
-              const CircularProgressIndicator(
-                color: Colors.deepPurple, // o tu color principal
+              const Text(
+                "DETODO",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: 2,
+                ),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Cargando DeTodo...",
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+                "Cargando bazar futurista...",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.cyanAccent,
+                  fontStyle: FontStyle.italic,
+                  letterSpacing: 1,
+                ),
               ),
             ],
           ),
