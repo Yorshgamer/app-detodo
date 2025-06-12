@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'user_home_screen.dart';
+import '../user/MainNavScreen.dart'; // Asegúrate de importar esto
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -43,7 +42,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const UserHomeScreen()),
+        MaterialPageRoute(
+          builder: (_) => const MainNavScreen(modoInvitado: false),
+        ),
       );
     } on FirebaseAuthException catch (e) {
       setState(() => error = e.message ?? 'Error desconocido');
@@ -131,17 +132,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             cargando
                 ? const CircularProgressIndicator(color: Colors.cyanAccent)
                 : SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyanAccent,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: registrar,
-                      child: const Text('Registrarse'),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.cyanAccent,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
+                    onPressed: registrar,
+                    child: const Text('Registrarse'),
                   ),
+                ),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // Asegúrate de importar esto
+import '../auth/login_screen.dart'; // Asegúrate de importar esto
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CatalogoScreen extends StatefulWidget {

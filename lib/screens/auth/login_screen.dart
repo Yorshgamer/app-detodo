@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../widgets/custom_textfield.dart';
-import 'user_home_screen.dart';
-import 'admin_home_screen.dart';
+import '../user/MainNavScreen.dart'; // Asegúrate de importar esto
+import '../../widgets/custom_textfield.dart';
+import '../admin/admin_home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,9 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const UserHomeScreen()),
-        );
+        context,
+        MaterialPageRoute(
+          builder: (_) => const MainNavScreen(modoInvitado: false),
+        ),
+      );
       }
     } on FirebaseAuthException catch (e) {
       setState(() => error = e.message ?? 'Error desconocido');
