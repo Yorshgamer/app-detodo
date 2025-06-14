@@ -15,6 +15,17 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
   String _busqueda = '';
   String _filtroTipo = 'Todos';
 
+  String convertirEnlaceDriveADirecto(String enlaceDrive) {
+    final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+    final match = regExp.firstMatch(enlaceDrive);
+    if (match != null && match.groupCount >= 1) {
+      final id = match.group(1);
+      return 'https://drive.google.com/uc?export=view&id=$id';
+    } else {
+      return enlaceDrive;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,7 +158,8 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                     final prod = productosFiltrados[index];
                     final nombre = prod['nombre'];
                     final precio = prod['precio'];
-                    final imagenUrl = prod.data().toString().contains('imagenURL') ? prod['imagenURL'] : '';
+                    final imagenOriginal = prod.data().toString().contains('imagenURL') ? prod['imagenURL'] : '';
+                    final imagenUrl = convertirEnlaceDriveADirecto(imagenOriginal);
 
                     return Card(
                       color: Colors.grey[900],
@@ -186,7 +198,7 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '\$${precio.toStringAsFixed(2)}',
+                                  'S/ ${precio.toStringAsFixed(2)}',
                                   style: const TextStyle(
                                     fontSize: 20,
                                     color: Colors.cyanAccent,
