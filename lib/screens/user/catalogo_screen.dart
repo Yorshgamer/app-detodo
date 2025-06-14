@@ -71,7 +71,10 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.cyanAccent, width: 2),
+                  borderSide: const BorderSide(
+                    color: Colors.cyanAccent,
+                    width: 2,
+                  ),
                 ),
               ),
               onChanged: (value) {
@@ -97,7 +100,10 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.cyanAccent, width: 2),
+                  borderSide: const BorderSide(
+                    color: Colors.cyanAccent,
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -120,10 +126,15 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
           // 📦 Productos
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('productos').snapshots(),
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('productos')
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.cyanAccent));
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.cyanAccent),
+                  );
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -135,15 +146,18 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                   );
                 }
 
-                final productosFiltrados = snapshot.data!.docs.where((doc) {
-                  final nombre = doc['nombre'].toString().toLowerCase();
-                  final tipo = doc['tipo'].toString().toLowerCase();
+                final productosFiltrados =
+                    snapshot.data!.docs.where((doc) {
+                      final nombre = doc['nombre'].toString().toLowerCase();
+                      final tipo = doc['tipo'].toString().toLowerCase();
 
-                  final coincideBusqueda = nombre.contains(_busqueda);
-                  final coincideFiltro = _filtroTipo == 'Todos' || tipo == _filtroTipo.toLowerCase();
+                      final coincideBusqueda = nombre.contains(_busqueda);
+                      final coincideFiltro =
+                          _filtroTipo == 'Todos' ||
+                          tipo == _filtroTipo.toLowerCase();
 
-                  return coincideBusqueda && coincideFiltro;
-                }).toList();
+                      return coincideBusqueda && coincideFiltro;
+                    }).toList();
 
                 return GridView.builder(
                   padding: const EdgeInsets.all(12),
@@ -158,29 +172,58 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                     final prod = productosFiltrados[index];
                     final nombre = prod['nombre'];
                     final precio = prod['precio'];
-                    final imagenOriginal = prod.data().toString().contains('imagenURL') ? prod['imagenURL'] : '';
-                    final imagenUrl = convertirEnlaceDriveADirecto(imagenOriginal);
+                    final imagenOriginal = prod['imagenURL'];
+                    final imagenUrl = convertirEnlaceDriveADirecto(
+                      imagenOriginal,
+                    );
 
                     return Card(
                       color: Colors.grey[900],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       elevation: 4,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                            child: imagenUrl.isNotEmpty
-                                ? Image.network(
-                                    imagenUrl,
-                                    height: 130,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, progress) =>
-                                        progress == null ? child : const Center(child: CircularProgressIndicator()),
-                                    errorBuilder: (_, __, ___) =>
-                                        const Icon(Icons.broken_image, color: Colors.white54, size: 100),
-                                  )
-                                : const Icon(Icons.image_not_supported, size: 100, color: Colors.white24),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            child:
+                                imagenUrl.isNotEmpty
+                                    ? Builder(
+                                      builder: (context) {
+                                        print(
+                                          '🖼️ Cargando imagen: $imagenUrl',
+                                        ); // 👈 Aquí va el print
+
+                                        return Image.network(
+                                          imagenUrl,
+                                          height: 130,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder:
+                                              (context, child, progress) =>
+                                                  progress == null
+                                                      ? child
+                                                      : const Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      ),
+                                          errorBuilder:
+                                              (_, __, ___) => const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.white54,
+                                                size: 100,
+                                              ),
+                                        );
+                                      },
+                                    )
+                                    : const Icon(
+                                      Icons.image_not_supported,
+                                      size: 100,
+                                      color: Colors.white24,
+                                    ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(10),
@@ -213,7 +256,11 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                                   ),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('$nombre agregado al carrito')),
+                                      SnackBar(
+                                        content: Text(
+                                          '$nombre agregado al carrito',
+                                        ),
+                                      ),
                                     );
                                   },
                                   child: const Text('Agregar'),
