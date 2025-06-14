@@ -14,7 +14,7 @@ class _ContactoScreenState extends State<ContactoScreen> {
   GoogleMapController? mapController;
   LatLng? userLocation;
 
-  final LatLng localLocation = const LatLng(-12.0684, -75.2105); // Cambia a la dirección de tu local
+  final LatLng localLocation = const LatLng(-12.0684, -75.2105); // Dirección de tu tienda
 
   @override
   void initState() {
@@ -46,6 +46,40 @@ class _ContactoScreenState extends State<ContactoScreen> {
     }
   }
 
+  Widget _infoContacto() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+      child: Column(
+        children: [
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.phone, color: Colors.green),
+              title: const Text('Llámanos'),
+              subtitle: const Text('+51 987 654 321'),
+              onTap: () => launchUrl(Uri.parse('tel:+51987654321')),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.email, color: Colors.red),
+              title: const Text('Correo'),
+              subtitle: const Text('bazardtodo@gmail.com'),
+              onTap: () => launchUrl(Uri.parse('mailto:bazardtodo@gmail.com')),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.location_on, color: Colors.blue),
+              title: const Text('Dirección'),
+              subtitle: const Text('Jr. Huancayo 123, El Tambo, Huancayo'),
+              onTap: _abrirRutaEnMaps,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +95,8 @@ class _ContactoScreenState extends State<ContactoScreen> {
               textAlign: TextAlign.center,
             ),
           ),
+          _infoContacto(),
+          const SizedBox(height: 10),
           Expanded(
             child: userLocation == null
                 ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
