@@ -55,23 +55,23 @@ class _ContactoScreenState extends State<ContactoScreen> {
             child: ListTile(
               leading: const Icon(Icons.phone, color: Colors.green),
               title: const Text('Llámanos'),
-              subtitle: const Text('+51 987 654 321'),
-              onTap: () => launchUrl(Uri.parse('tel:+51987654321')),
+              subtitle: const Text('+51 964605500'),
+              onTap: () => launchUrl(Uri.parse('tel:+51964605500')),
             ),
           ),
           Card(
             child: ListTile(
               leading: const Icon(Icons.email, color: Colors.red),
               title: const Text('Correo'),
-              subtitle: const Text('bazardtodo@gmail.com'),
-              onTap: () => launchUrl(Uri.parse('mailto:bazardtodo@gmail.com')),
+              subtitle: const Text('yorshyo123@gmail.com'),
+              onTap: () => launchUrl(Uri.parse('mailto:yorshyo123@gmail.com')),
             ),
           ),
           Card(
             child: ListTile(
               leading: const Icon(Icons.location_on, color: Colors.blue),
               title: const Text('Dirección'),
-              subtitle: const Text('Jr. Huancayo 123, El Tambo, Huancayo'),
+              subtitle: const Text('Jr. Junin 1915, Huancayo 12006'),
               onTap: _abrirRutaEnMaps,
             ),
           ),
