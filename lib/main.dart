@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'config/firebase_options.dart';
 import 'screens/auth/splash_screen.dart';
+import 'screens/user/carrito_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,9 +20,20 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'PasseroOne', // Usa aquí el nombre que declaraste en pubspec.yaml
+        fontFamily: 'PasseroOne', // Asegúrate que este está en pubspec.yaml
       ),
       home: const SplashScreen(),
+
+      // ✅ Aquí registramos rutas nombradas
+      onGenerateRoute: (settings) {
+        if (settings.name == '/carrito') {
+          final carrito = settings.arguments as List<Map<String, dynamic>>;
+          return MaterialPageRoute(
+            builder: (context) => CarritoScreen(carrito: carrito),
+          );
+        }
+        return null;
+      },
     );
   }
 }
