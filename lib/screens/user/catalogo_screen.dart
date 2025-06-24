@@ -15,9 +15,7 @@ class _CatalogoScreenState extends State<CatalogoScreen>
     with TickerProviderStateMixin {
   String _busqueda = '';
   String _filtroTipo = 'Todos';
-
   List<Map<String, dynamic>> carrito = [];
-
   late AnimationController _iconAnimationController;
   late Animation<double> _scaleAnimation;
 
@@ -227,10 +225,9 @@ class _CatalogoScreenState extends State<CatalogoScreen>
                   const SizedBox(height: 10),
                   Expanded(
                     child: StreamBuilder<QuerySnapshot>(
-                      stream:
-                          FirebaseFirestore.instance
-                              .collection('productos')
-                              .snapshots(),
+                      stream: FirebaseFirestore.instance
+                          .collection('productos')
+                          .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -252,29 +249,28 @@ class _CatalogoScreenState extends State<CatalogoScreen>
 
                         final productosFiltrados =
                             snapshot.data!.docs.where((doc) {
-                              final nombre =
-                                  doc['nombre'].toString().toLowerCase();
-                              final tipo = doc['tipo'].toString().toLowerCase();
+                          final nombre =
+                              doc['nombre'].toString().toLowerCase();
+                          final tipo = doc['tipo'].toString().toLowerCase();
 
-                              final coincideBusqueda = nombre.contains(
-                                _busqueda,
-                              );
-                              final coincideFiltro =
-                                  _filtroTipo == 'Todos' ||
-                                  tipo == _filtroTipo.toLowerCase();
+                          final coincideBusqueda = nombre.contains(
+                            _busqueda,
+                          );
+                          final coincideFiltro = _filtroTipo == 'Todos' ||
+                              tipo == _filtroTipo.toLowerCase();
 
-                              return coincideBusqueda && coincideFiltro;
-                            }).toList();
+                          return coincideBusqueda && coincideFiltro;
+                        }).toList();
 
                         return GridView.builder(
                           padding: const EdgeInsets.all(12),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 2 / 2.5,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                              ),
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.5, // Relación más cuadrada
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
                           itemCount: productosFiltrados.length,
                           itemBuilder: (context, index) {
                             final prod = productosFiltrados[index];
@@ -294,78 +290,95 @@ class _CatalogoScreenState extends State<CatalogoScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(16),
-                                    ),
-                                    child:
-                                        imagenUrl.isNotEmpty
-                                            ? Image.network(
+                                  // Imagen con altura proporcional
+                                  AspectRatio(
+                                    aspectRatio: 1, // Imagen cuadrada
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                      child: imagenUrl.isNotEmpty
+                                          ? Image.network(
                                               imagenUrl,
-                                              height: 130,
                                               fit: BoxFit.cover,
-                                              loadingBuilder:
-                                                  (context, child, progress) =>
-                                                      progress == null
-                                                          ? child
-                                                          : const Center(
-                                                            child:
-                                                                CircularProgressIndicator(),
-                                                          ),
+                                              loadingBuilder: (context,
+                                                      child, progress) =>
+                                                  progress == null
+                                                      ? child
+                                                      : const Center(
+                                                          child:
+                                                              CircularProgressIndicator(),
+                                                        ),
                                               errorBuilder:
                                                   (_, __, ___) => const Icon(
-                                                    Icons.broken_image,
-                                                    color: Colors.white54,
-                                                    size: 100,
-                                                  ),
+                                                Icons.broken_image,
+                                                color: Colors.white54,
+                                                size: 60,
+                                              ),
                                             )
-                                            : const Icon(
+                                          : const Icon(
                                               Icons.image_not_supported,
-                                              size: 100,
+                                              size: 60,
                                               color: Colors.white24,
                                             ),
+                                    ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          nombre,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.white,
+                                  // Contenido flexible
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          // Nombre del producto
+                                          Flexible(
+                                            child: Text(
+                                              nombre,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'S/ ${precio.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.cyanAccent,
-                                            fontWeight: FontWeight.w600,
+                                          // Precio
+                                          Text(
+                                            'S/ ${precio.toStringAsFixed(2)}',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.cyanAccent,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.cyanAccent,
-                                            foregroundColor: Colors.black,
+                                          // Botón con tamaño fijo
+                                          SizedBox(
+                                            height: 36, // Altura fija
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.cyanAccent,
+                                                foregroundColor: Colors.black,
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                              onPressed: () {
+                                                agregarAlCarrito({
+                                                  'id': prod.id,
+                                                  'nombre': nombre,
+                                                  'precio': precio,
+                                                  'imagenURL': imagenOriginal,
+                                                });
+                                              },
+                                              child: const Text('Agregar'),
+                                            ),
                                           ),
-                                          onPressed: () {
-                                            agregarAlCarrito({
-                                              'id': prod.id,
-                                              'nombre': nombre,
-                                              'precio': precio,
-                                              'imagenURL': imagenOriginal,
-                                            });
-                                          },
-                                          child: const Text('Agregar'),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],

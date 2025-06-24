@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactoScreen extends StatefulWidget {
@@ -13,13 +14,13 @@ class ContactoScreen extends StatefulWidget {
 class _ContactoScreenState extends State<ContactoScreen> {
   GoogleMapController? mapController;
   LatLng? userLocation;
-
-  final LatLng localLocation = const LatLng(-12.0684, -75.2105); // Dirección de tu tienda
+  LatLng? localLocation; // Ahora será cargado dinámicamente desde Firestore
 
   @override
   void initState() {
     super.initState();
     _getUserLocation();
+    _getLocalLocation();
   }
 
   Future<void> _getUserLocation() async {
@@ -35,10 +36,25 @@ class _ContactoScreenState extends State<ContactoScreen> {
     });
   }
 
+  Future<void> _getLocalLocation() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('tienda')
+        .doc('principal')
+        .get();
+
+    final data = snapshot.data();
+    if (data != null && data['ubicacion'] != null) {
+      final geo = data['ubicacion'] as GeoPoint;
+      setState(() {
+        localLocation = LatLng(geo.latitude, geo.longitude);
+      });
+    }
+  }
+
   void _abrirRutaEnMaps() async {
-    if (userLocation != null) {
+    if (userLocation != null && localLocation != null) {
       final url = Uri.parse(
-        'https://www.google.com/maps/dir/?api=1&origin=${userLocation!.latitude},${userLocation!.longitude}&destination=${localLocation.latitude},${localLocation.longitude}&travelmode=driving',
+        'https://www.google.com/maps/dir/?api=1&origin=${userLocation!.latitude},${userLocation!.longitude}&destination=${localLocation!.latitude},${localLocation!.longitude}&travelmode=driving',
       );
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
@@ -82,6 +98,8 @@ class _ContactoScreenState extends State<ContactoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ubicacionesCargadas = userLocation != null && localLocation != null;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(title: const Text('Contáctanos')),
@@ -98,18 +116,17 @@ class _ContactoScreenState extends State<ContactoScreen> {
           _infoContacto(),
           const SizedBox(height: 10),
           Expanded(
-            child: userLocation == null
-                ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
-                : GoogleMap(
+            child: ubicacionesCargadas
+                ? GoogleMap(
                     onMapCreated: (controller) => mapController = controller,
                     initialCameraPosition: CameraPosition(
-                      target: localLocation,
+                      target: localLocation!,
                       zoom: 15,
                     ),
                     markers: {
                       Marker(
                         markerId: const MarkerId('local'),
-                        position: localLocation,
+                        position: localLocation!,
                         infoWindow: const InfoWindow(title: 'Nuestro Local'),
                       ),
                       Marker(
@@ -119,6 +136,9 @@ class _ContactoScreenState extends State<ContactoScreen> {
                         infoWindow: const InfoWindow(title: 'Tú'),
                       ),
                     },
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(color: Colors.cyanAccent),
                   ),
           ),
           ElevatedButton.icon(
