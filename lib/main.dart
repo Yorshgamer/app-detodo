@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'config/firebase_options.dart';
 import 'screens/auth/splash_screen.dart';
 import 'screens/user/carrito_screen.dart';
+import 'screens/user/historial_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,11 +21,11 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'PasseroOne', // Asegúrate que este está en pubspec.yaml
+        fontFamily: 'PasseroOne', // Asegúrate de declararlo en pubspec.yaml
       ),
       home: const SplashScreen(),
 
-      // ✅ Aquí registramos rutas nombradas
+      // ✅ Rutas nombradas dinámicas
       onGenerateRoute: (settings) {
         if (settings.name == '/carrito') {
           final carrito = settings.arguments as List<Map<String, dynamic>>;
@@ -32,7 +33,14 @@ class MainApp extends StatelessWidget {
             builder: (context) => CarritoScreen(carrito: carrito),
           );
         }
-        return null;
+
+        if (settings.name == '/historial') {
+          return MaterialPageRoute(
+            builder: (context) => const HistorialScreen(),
+          );
+        }
+
+        return null; // Ruta no encontrada
       },
     );
   }

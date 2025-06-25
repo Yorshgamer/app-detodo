@@ -58,51 +58,72 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   Widget _buildPerfil() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.account_circle, size: 100, color: Colors.cyanAccent),
-        const SizedBox(height: 20),
-        Text(
-          nombreUsuario ?? 'Cargando...',
-          style: const TextStyle(
-            color: Colors.cyanAccent,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.account_circle, size: 100, color: Colors.cyanAccent),
+          const SizedBox(height: 20),
+          Text(
+            nombreUsuario ?? 'Cargando...',
+            style: const TextStyle(
+              color: Colors.cyanAccent,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
-        _datoCentrado('Correo', user?.email ?? ''),
-        _datoCentrado('UID', user?.uid ?? ''),
-        _datoCentrado('Proveedor', proveedor ?? ''),
-        _datoCentrado(
-          'Desde',
-          fechaRegistro != null
-              ? '${fechaRegistro!.day}/${fechaRegistro!.month}/${fechaRegistro!.year}'
-              : 'Desconocido',
-        ),
-        const SizedBox(height: 30),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          const SizedBox(height: 20),
+          _datoCentrado('Correo', user?.email ?? ''),
+          _datoCentrado('UID', user?.uid ?? ''),
+          _datoCentrado('Proveedor', proveedor ?? ''),
+          _datoCentrado(
+            'Desde',
+            fechaRegistro != null
+                ? '${fechaRegistro!.day}/${fechaRegistro!.month}/${fechaRegistro!.year}'
+                : 'Desconocido',
           ),
-          icon: const Icon(Icons.logout),
-          label: const Text('Cerrar sesión'),
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          },
-        ),
-      ],
+          const SizedBox(height: 30),
+
+          // ✅ Botón para ver historial de compras
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pushNamed(context, '/historial');
+            },
+            icon: const Icon(Icons.history),
+            label: const Text('Ver Historial de Compras'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyanAccent,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Botón de cerrar sesión
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            icon: const Icon(Icons.logout),
+            label: const Text('Cerrar sesión'),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget _datoCentrado(String titulo, String valor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
         children: [
           Text(
