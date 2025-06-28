@@ -27,7 +27,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(minutes: 5), () {
+    _inactivityTimer = Timer(const Duration(seconds: 20), () {
       FirebaseAuth.instance.signOut();
     });
   }
