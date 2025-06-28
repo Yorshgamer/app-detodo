@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../widgets/logo_widget.dart';
 
 class ContactoScreen extends StatefulWidget {
   const ContactoScreen({super.key});
@@ -37,10 +38,11 @@ class _ContactoScreenState extends State<ContactoScreen> {
   }
 
   Future<void> _getLocalLocation() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('tienda')
-        .doc('principal')
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('tienda')
+            .doc('principal')
+            .get();
 
     final data = snapshot.data();
     if (data != null && data['ubicacion'] != null) {
@@ -105,6 +107,8 @@ class _ContactoScreenState extends State<ContactoScreen> {
       appBar: AppBar(title: const Text('Contáctanos')),
       body: Column(
         children: [
+          const SizedBox(height: 20),
+          const LogoWidget(size: 100),
           const Padding(
             padding: EdgeInsets.all(12),
             child: Text(
@@ -116,35 +120,43 @@ class _ContactoScreenState extends State<ContactoScreen> {
           _infoContacto(),
           const SizedBox(height: 10),
           Expanded(
-            child: ubicacionesCargadas
-                ? GoogleMap(
-                    onMapCreated: (controller) => mapController = controller,
-                    initialCameraPosition: CameraPosition(
-                      target: localLocation!,
-                      zoom: 15,
+            child:
+                ubicacionesCargadas
+                    ? GoogleMap(
+                      onMapCreated: (controller) => mapController = controller,
+                      initialCameraPosition: CameraPosition(
+                        target: localLocation!,
+                        zoom: 15,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId('local'),
+                          position: localLocation!,
+                          infoWindow: const InfoWindow(title: 'Nuestro Local'),
+                        ),
+                        Marker(
+                          markerId: const MarkerId('user'),
+                          position: userLocation!,
+                          icon: BitmapDescriptor.defaultMarkerWithHue(
+                            BitmapDescriptor.hueAzure,
+                          ),
+                          infoWindow: const InfoWindow(title: 'Tú'),
+                        ),
+                      },
+                    )
+                    : const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.cyanAccent,
+                      ),
                     ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId('local'),
-                        position: localLocation!,
-                        infoWindow: const InfoWindow(title: 'Nuestro Local'),
-                      ),
-                      Marker(
-                        markerId: const MarkerId('user'),
-                        position: userLocation!,
-                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-                        infoWindow: const InfoWindow(title: 'Tú'),
-                      ),
-                    },
-                  )
-                : const Center(
-                    child: CircularProgressIndicator(color: Colors.cyanAccent),
-                  ),
           ),
           ElevatedButton.icon(
             onPressed: _abrirRutaEnMaps,
             icon: const Icon(Icons.directions, color: Colors.black),
-            label: const Text("Cómo llegar", style: TextStyle(color: Colors.black)),
+            label: const Text(
+              "Cómo llegar",
+              style: TextStyle(color: Colors.black),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.cyanAccent,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
