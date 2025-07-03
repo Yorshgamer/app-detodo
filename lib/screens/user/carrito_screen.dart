@@ -19,6 +19,125 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
+  void _mostrarResumenCompra(BuildContext context) {
+    String metodoPago = 'Efectivo';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            'Resumen de compra',
+            style: TextStyle(color: Colors.cyanAccent),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...widget.carrito.map((item) {
+                    final cantidad = item['cantidad'] ?? 1;
+                    final totalItem = (item['precio'] ?? 0) * cantidad;
+                    return ListTile(
+                      title: Text(
+                        item['nombre'],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        'Cantidad: $cantidad x S/ ${item['precio']}',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      trailing: Text(
+                        'S/ ${totalItem.toStringAsFixed(2)}',
+                        style: const TextStyle(color: Colors.cyanAccent),
+                      ),
+                    );
+                  }).toList(),
+                  const Divider(color: Colors.white24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total:',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'S/ ${calcularTotal().toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.cyanAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: metodoPago,
+                    dropdownColor: Colors.grey[850],
+                    decoration: const InputDecoration(
+                      labelText: 'Método de Pago',
+                      labelStyle: TextStyle(color: Colors.white),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white54),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                    items:
+                        ['Efectivo', 'Yape'].map((m) {
+                          return DropdownMenuItem(
+                            value: m,
+                            child: Text(
+                              m,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        metodoPago = value!;
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await guardarCompraEnFirestoreConMetodo(metodoPago);
+                if (mounted) {
+                  setState(() => widget.carrito.clear());
+                  Navigator.pop(context); // cerrar modal
+                  Navigator.pop(context); // volver al catálogo
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Compra registrada con éxito'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void eliminarProducto(int index) {
     setState(() {
       widget.carrito.removeAt(index);
@@ -45,14 +164,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
-  Future<void> guardarCompraEnFirestore() async {
+  Future<void> guardarCompraEnFirestoreConMetodo(String metodoPago) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inicia sesión para continuar')),
-      );
-      return;
-    }
+    if (user == null) return;
 
     final uid = user.uid;
     final comprasRef = FirebaseFirestore.instance
@@ -62,7 +176,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
     final total = calcularTotal();
     final fecha = DateTime.now();
-
     final productos =
         widget.carrito
             .map(
@@ -80,6 +193,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
       'productos': productos,
       'total': total,
       'fecha': fecha,
+      'metodo_pago': metodoPago,
     });
   }
 
@@ -212,20 +326,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () async {
-                        await guardarCompraEnFirestore();
-                        setState(() {
-                          widget.carrito.clear();
-                        });
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Compra registrada exitosamente'),
-                            ),
-                          );
-                          Navigator.pop(context); // Vuelve al catálogo
-                        }
-                      },
+                      onPressed: () => _mostrarResumenCompra(context),
                       icon: const Icon(Icons.shopping_bag),
                       label: const Text('Pagar'),
                       style: ElevatedButton.styleFrom(
