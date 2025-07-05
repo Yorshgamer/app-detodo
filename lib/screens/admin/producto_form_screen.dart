@@ -60,24 +60,43 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Producto guardado con éxito')),
+      const SnackBar(content: Text('✅ Producto guardado con éxito')),
     );
 
     Navigator.pop(context);
+  }
+
+  InputDecoration _inputStyle(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.cyanAccent),
+      filled: true,
+      fillColor: Colors.white12,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.cyanAccent),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.white),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(widget.isNew ? "Nuevo Producto" : "Editar Producto"),
+        backgroundColor: Colors.cyanAccent,
+        foregroundColor: Colors.black,
+      ),
       body: Center(
         child: Container(
           width: 600,
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white12,
-            borderRadius: BorderRadius.circular(16),
-          ),
           child: Form(
             key: _formKey,
             child: ListView(
@@ -85,17 +104,18 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
               children: [
                 TextFormField(
                   initialValue: nombre,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                  onSaved: (val) => nombre = val!,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputStyle('Nombre'),
+                  onSaved: (val) => nombre = val!.trim(),
                   validator: (val) =>
-                      val == null || val.isEmpty ? 'Requerido' : null,
+                      val == null || val.trim().isEmpty ? 'Campo requerido' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   initialValue: precio.toString(),
-                  decoration: const InputDecoration(labelText: 'Precio'),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputStyle('Precio'),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   onSaved: (val) => precio = double.parse(val!),
                   validator: (val) {
                     final n = double.tryParse(val ?? '');
@@ -104,27 +124,36 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField(
+                DropdownButtonFormField<String>(
                   value: tipo,
                   items: tipos
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .map((t) => DropdownMenuItem(
+                            value: t,
+                            child: Text(t),
+                          ))
                       .toList(),
                   onChanged: (val) => setState(() => tipo = val!),
-                  decoration: const InputDecoration(labelText: 'Tipo'),
+                  decoration: _inputStyle('Tipo'),
+                  dropdownColor: Colors.black,
+                  style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   initialValue: imagenURL,
-                  decoration: const InputDecoration(labelText: 'URL Imagen'),
-                  onSaved: (val) => imagenURL = val!,
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'URL requerida' : null,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputStyle('URL Imagen'),
+                  onSaved: (val) => imagenURL = val!.trim(),
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'URL requerida';
+                    if (!val.startsWith('http')) return 'Debe ser una URL válida';
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   initialValue: descripcion,
-                  decoration:
-                      const InputDecoration(labelText: 'Descripción (opcional)'),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputStyle('Descripción (opcional)'),
                   onSaved: (val) => descripcion = val ?? '',
                   maxLines: 3,
                 ),
@@ -132,7 +161,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                 ElevatedButton.icon(
                   onPressed: _guardarProducto,
                   icon: const Icon(Icons.save),
-                  label: const Text('Guardar'),
+                  label: const Text('Guardar Producto'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.cyanAccent,
                     foregroundColor: Colors.black,
