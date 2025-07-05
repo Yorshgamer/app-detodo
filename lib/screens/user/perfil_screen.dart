@@ -39,10 +39,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Future<void> _cargarDatosUsuario() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(currentUser.uid)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(currentUser.uid)
+              .get();
 
       final data = snapshot.data();
 
@@ -72,10 +73,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final bytes = await imagenSeleccionada!.readAsBytes();
     final base64Image = base64Encode(bytes);
 
-    await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(user!.uid)
-        .set({'fotoPerfilBase64': base64Image}, SetOptions(merge: true));
+    await FirebaseFirestore.instance.collection('usuarios').doc(user!.uid).set({
+      'fotoPerfilBase64': base64Image,
+    }, SetOptions(merge: true));
 
     setState(() {
       imagenBase64 = base64Image;
@@ -97,10 +97,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
       return;
     }
 
-    await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(user!.uid)
-        .set({
+    await FirebaseFirestore.instance.collection('usuarios').doc(user!.uid).set({
       'nombre': nombreController.text.trim(),
       'celular': celularController.text.trim(),
       'direccion': direccionController.text.trim(),
@@ -134,9 +131,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 radius: 70,
                 backgroundImage: imageProvider,
                 backgroundColor: Colors.white10,
-                child: imageProvider == null
-                    ? const Icon(Icons.person, size: 70, color: Colors.cyanAccent)
-                    : null,
+                child:
+                    imageProvider == null
+                        ? const Icon(
+                          Icons.person,
+                          size: 70,
+                          color: Colors.cyanAccent,
+                        )
+                        : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
@@ -151,7 +153,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
               if (imagenSeleccionada != null)
                 ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
                   onPressed: subirImagen,
                   icon: const Icon(Icons.check),
                   label: const Text("Guardar imagen"),
@@ -159,7 +163,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
               const SizedBox(height: 30),
 
               _campoEditable('Nombre completo', nombreController),
-              _campoEditable('Celular', celularController, tipo: TextInputType.phone),
+              _campoEditable(
+                'Celular',
+                celularController,
+                tipo: TextInputType.phone,
+              ),
               _campoEditable('Dirección', direccionController),
 
               _datoCentrado(
@@ -191,6 +199,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/sensores');
+                },
+                icon: const Icon(Icons.sensors),
+                label: const Text('Ver Sensores'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurpleAccent,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
                   foregroundColor: Colors.white,
@@ -217,13 +236,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
               style: const TextStyle(fontSize: 10, color: Colors.white),
             ),
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _campoEditable(String label, TextEditingController controller,
-      {TextInputType tipo = TextInputType.text}) {
+  Widget _campoEditable(
+    String label,
+    TextEditingController controller, {
+    TextInputType tipo = TextInputType.text,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
@@ -234,9 +256,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white70),
           enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white24)),
+            borderSide: BorderSide(color: Colors.white24),
+          ),
           focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.cyanAccent)),
+            borderSide: BorderSide(color: Colors.cyanAccent),
+          ),
         ),
       ),
     );
@@ -247,12 +271,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
         children: [
-          Text(titulo,
-              style: const TextStyle(color: Colors.white70, fontSize: 14)),
+          Text(
+            titulo,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
           const SizedBox(height: 4),
-          Text(valor,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 16)),
+          Text(
+            valor,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
         ],
       ),
     );
@@ -291,8 +319,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
               MaterialPageRoute(builder: (_) => const RegisterScreen()),
             );
           },
-          child: const Text('¿No tienes cuenta? Regístrate',
-              style: TextStyle(color: Colors.white70)),
+          child: const Text(
+            '¿No tienes cuenta? Regístrate',
+            style: TextStyle(color: Colors.white70),
+          ),
         ),
       ],
     );

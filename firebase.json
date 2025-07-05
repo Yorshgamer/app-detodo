@@ -1,1 +1,39 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"detodo-40bb0","appId":"1:225070298552:android:37b8c9c53508a546280b4d","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"detodo-40bb0","configurations":{"android":"1:225070298552:android:37b8c9c53508a546280b4d","ios":"1:225070298552:ios:a12f0f29a5414e3d280b4d","macos":"1:225070298552:ios:a12f0f29a5414e3d280b4d","web":"1:225070298552:web:9e35e98824877adb280b4d","windows":"1:225070298552:web:d576eff3c809d5ca280b4d"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "detodo-40bb0",
+          "appId": "1:225070298552:android:37b8c9c53508a546280b4d",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "detodo-40bb0",
+          "configurations": {
+            "android": "1:225070298552:android:37b8c9c53508a546280b4d",
+            "ios": "1:225070298552:ios:a12f0f29a5414e3d280b4d",
+            "macos": "1:225070298552:ios:a12f0f29a5414e3d280b4d",
+            "web": "1:225070298552:web:9e35e98824877adb280b4d",
+            "windows": "1:225070298552:web:d576eff3c809d5ca280b4d"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

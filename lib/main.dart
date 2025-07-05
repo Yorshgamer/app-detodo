@@ -4,14 +4,13 @@ import 'config/firebase_options.dart';
 import 'screens/auth/splash_screen.dart';
 import 'screens/user/carrito_screen.dart';
 import 'screens/user/historial_screen.dart';
+import 'screens/user/sensores_screen.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MainApp());
 }
 
@@ -27,7 +26,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(seconds: 20), () {
+    _inactivityTimer = Timer(const Duration(minutes: 5), () {
       FirebaseAuth.instance.signOut();
     });
   }
@@ -62,9 +61,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
       onPointerDown: (_) => _startInactivityTimer(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: 'PasseroOne',
-        ),
+        theme: ThemeData(fontFamily: 'PasseroOne'),
         home: const SplashScreen(),
         onGenerateRoute: (settings) {
           if (settings.name == '/carrito') {
@@ -80,6 +77,11 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             );
           }
 
+          if (settings.name == '/sensores') {
+            return MaterialPageRoute(
+              builder: (context) => const SensoresScreen(),
+            );
+          }
           return null;
         },
       ),
